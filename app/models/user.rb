@@ -1,7 +1,12 @@
 class User < ActiveRecord::Base
+
+  scope :active, -> {
+    introduction = arel_table[:introduction]
+    where(introduction.not_eq(nil).and(introduction.not_eq('')))
+  }
+
   devise :trackable, :omniauthable, omniauth_providers: [:github]
 
-  has_many :interests
   has_many :event_participations, dependent: :destroy
   has_many :events, through: :event_participations
 
@@ -41,5 +46,9 @@ class User < ActiveRecord::Base
     d1 = birthday.strftime("%Y%m%d").to_i
     d2 = Date.current.strftime("%Y%m%d").to_i
     (d2 - d1) / 10000
+  end
+
+  def active?
+    introduction.present?
   end
 end

@@ -18,26 +18,29 @@ html
             span.icon-bar
           = link_to 'Kobe Rubyist Connect', users_path, class: 'navbar-brand text-muted logo'
         .collapse.navbar-collapse
-          ul.nav.navbar-nav
-            li
-              = link_to events_path do
-                = fa_icon 'calendar', text: 'Event'
           ul.nav.navbar-nav.navbar-right
             li
-              = link_to users_path do
+              = link_to users_path, data: {toggle: 'tooltip', placement: 'bottom'}, title: 'Home' do
                 = fa_icon 'home 2x'
+                span.text-hide Home
             li
-              = link_to edit_user_path, class: 'settings-link' do
+              = link_to events_path, data: {toggle: 'tooltip', placement: 'bottom'}, title: 'Events' do
+                = fa_icon 'calendar 2x'
+                span.text-hide Event
+            li
+              = link_to edit_user_path, data: {toggle: 'tooltip', placement: 'bottom'}, title: 'Settings', class: 'settings-link' do
                 = fa_icon 'gears 2x'
-            li#signout
-              = link_to 'Sign out', destroy_user_session_path, method: :delete
+                span.text-hide Settings
+            li
+              = link_to destroy_user_session_path, data: {toggle: 'tooltip', placement: 'bottom'}, title: 'Sign out', method: :delete do
+                = fa_icon 'sign-out 2x'
+                span.text-hide Sign out
           = search_form_for @q, url: users_path , class: 'navbar-form navbar-right' do |f|
-            .form-group
+            .form-group.nav-search
               = f.search_field :name_or_twitter_name_or_facebook_name_or_qiita_name_or_nickname_cont, placeholder: 'User Search', class: 'form-control'
               = button_tag class: 'btn btn-primary btn-navbar' do
                 = fa_icon 'search'
     .container.container-main
-      = simple_format(flash[:notice], class: "alert alert-success") if flash[:notice].present?
-      = simple_format(flash[:alert], class: "alert alert-warning") if flash[:alert].present?
+      = render 'layouts/flash_messages'
       = yield
     = yield :foot

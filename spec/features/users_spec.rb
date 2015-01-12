@@ -4,9 +4,8 @@ feature 'Users spec' do
   scenario 'ログイン - 登録情報変更 - ユーザ検索 - ログアウトができること' do
     sign_in_as_new_user
 
-    expect(page).to have_content 'Alice'
-
-    find('.settings-link').click
+    expect(page).to have_content 'あなたの自己紹介を入力すると、ユーザー一覧にあなたが表示されます'
+    expect(page).to have_content 'ユーザ情報の更新'
 
     fill_in '自己紹介文', with: 'よろしくお願いします。'
     fill_in 'Twitter ユーザ名', with: 'alice-twitter'
@@ -56,9 +55,7 @@ feature 'Users spec' do
   scenario '退会ができること' do
     sign_in_as_new_user
 
-    expect(page).to have_content 'Alice'
-
-    find('.settings-link').click
+    expect(page).to have_content 'ユーザ情報の更新'
 
     expect{click_link '退会'}.to change{User.count}.by(-1)
 
