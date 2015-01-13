@@ -1,6 +1,11 @@
 require 'rails_helper'
 
 feature 'Users spec' do
+  scenario '自己紹介が登録されているユーザでログインした場合、ユーザの一覧ページへリダイレクトすること' do
+    sign_in_as_active_user
+    expect(current_path).to eq users_path
+  end
+
   scenario 'ログイン - 登録情報変更 - ユーザ検索 - ログアウトができること' do
     sign_in_as_new_user
 
@@ -63,9 +68,18 @@ feature 'Users spec' do
   end
 
   scenario '存在しないユーザーを表示しようとした場合はNot foundとすること' do
-    sign_in_as_new_user
+    user = sign_in_as_new_user
 
-    expect{visit user_path('alice')}.to_not raise_error
+    expect{visit user_path(user.nickname)}.to_not raise_error
     expect{visit user_path('Tom')}.to raise_error ActiveRecord::RecordNotFound
+  end
+
+  scenario 'activeなユーザーが表示されること' do
+    inactive = create :inactive_user
+    active = create :user
+    sign_in_with_github(active)
+
+    expect(page).to have_content active.name_or_nickname
+    expect(page).to_not have_content inactive.name_or_nickname
   end
 end
