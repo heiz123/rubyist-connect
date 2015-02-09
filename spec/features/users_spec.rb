@@ -7,7 +7,9 @@ feature 'Users spec' do
   end
 
   scenario 'ログイン - 登録情報変更 - ユーザ検索 - ログアウトができること' do
-    sign_in_as_new_user
+    Timecop.travel(2015, 2, 8, 14, 59, 30) do
+      sign_in_as_new_user
+    end
 
     expect(page).to have_content 'あなたの自己紹介を入力すると、ユーザー一覧にあなたが表示されます'
     expect(page).to have_content 'ユーザ情報の更新'
@@ -17,10 +19,23 @@ feature 'Users spec' do
     fill_in 'Facebook ユーザ名', with: 'alice-facebook'
     fill_in 'Qiita ユーザ名', with: 'alice-qiita'
     fill_in '名前', with: 'ありす'
-    click_on '更新'
+
+    Timecop.travel(2015, 3, 9, 15, 22, 45) do
+      click_on '更新'
+    end
+
+    expect(page).to have_content "参加日時:2015/02/08 14:59"
+    expect(page).to have_content "更新日時:2015/03/09 15:22"
+
+    click_on 'Sign out'
+
+    other_user = create :user
+    sign_in_with_github(other_user)
 
     expect(page).to have_content 'ありす'
     expect(page).to have_content 'よろしくお願いします'
+    show_link = find('.current-user-link')
+    expect(show_link[:href]).to eq user_path(other_user.nickname)
     # TODO TwitterやFacebookのリンク存在チェックもしたい
 
     within '.navbar form' do
@@ -55,6 +70,22 @@ feature 'Users spec' do
 
     click_on 'Sign out'
     expect(page).to have_content 'Rubyist は、すぐそこに'
+  end
+  
+  scenario 'ログアウト後にアラートが出ないこと' do
+    sign_in_as_new_user
+
+    click_on 'Sign out'
+
+    expect(page).to_not have_content 'ログアウトしました。'
+  end
+
+  scenario '退会後にアラートが出ること' do
+    sign_in_as_new_user
+
+    click_link '退会'
+
+    expect(page).to have_content '退会しました'
   end
 
   scenario '退会ができること' do

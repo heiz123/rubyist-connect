@@ -1,8 +1,13 @@
 class User < ActiveRecord::Base
+  has_many :event_participations, dependent: :destroy
 
   scope :active, -> {
     introduction = arel_table[:introduction]
     where(introduction.not_eq(nil).and(introduction.not_eq('')))
+  }
+
+  scope :without_login_user, -> (user) {
+    where.not(id: user.id) if user.present?
   }
 
   devise :trackable, :omniauthable, omniauth_providers: [:github]
